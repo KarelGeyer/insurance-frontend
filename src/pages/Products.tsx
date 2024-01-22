@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IProduct } from "../models/interfaces";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import CustomAccordion from "../components/Accordion";
 import { useSelector } from "react-redux";
 import { RootState } from "../state/redux/store";
@@ -9,6 +9,7 @@ import { categoryIntToName, filterTypeToAttribute } from "../helpers/functions";
 import { SortType } from "../helpers/enums";
 import ProductCard from "../components/ProductCard";
 import { getProducts } from "../helpers/axios/products";
+import Loading from "../components/Loading";
 
 const Products = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -72,7 +73,11 @@ const Products = () => {
   return (
     <>
       {loading ? (
-        <></>
+        <>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <Loading key={i} />
+          ))}
+        </>
       ) : (
         <>
           {productsView === "card" ? (

@@ -10,7 +10,6 @@ interface IProps {
 }
 
 const OrderConfiguration = ({ category }: IProps) => {
-  console.log("category", category);
   return (
     <ProductDetailWrapper marginTop={5}>
       {category === ProductCategory.LIFE_INSURANCE && <LifeInsuranceConfig />}

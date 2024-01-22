@@ -63,16 +63,17 @@ export const filterTypeToAttribute = (
 export const getHeaderNameFromLocation = (
   location: RouteType
 ): HeaderNameType => {
-  if (location.includes("/product")) return "Produkt";
+  if (location.includes("/product") && location != "/products")
+    return "Produkt";
   switch (location) {
     case "/":
       return "Hlavní Stránka";
     case "/products":
       return "Produkty";
-    case "/calculator":
-      return "Kalkulačka";
     case "/order":
       return "Objednávka";
+    case "/orders":
+      return "Objednávky";
     default:
       return "Hlavní Stránka";
   }
@@ -86,10 +87,10 @@ export const getLocationFromHeaderName = (
       return "/";
     case "Produkty":
       return "/products";
-    case "Kalkulačka":
-      return "/calculator";
     case "Objednávka":
       return "/order";
+    case "Objednávky":
+      return "/orders";
     default:
       return "/";
   }

@@ -1,20 +1,5 @@
 import axios from "axios";
-import { BaseRes } from ".";
-
-export interface PensionCalcReq {
-  currentSavings: number;
-  userContribution: number;
-  employerContribution: number;
-  pensionStrategy: string;
-  productId: string;
-  userAge: number;
-}
-
-export interface PensionCalcRes {
-  valorization: number;
-  totalSavings: number;
-  stateContribution: number;
-}
+import { BASE_API, BaseRes, LIFE_INSURANCE } from ".";
 
 export interface LifeInsuraceCalcReq {
   productId: string;
@@ -50,18 +35,8 @@ export const calculateLifeInsurance = async (
   FinallyClb?: () => void
 ) => {
   return axios
-    .post(
-      "https://ganny01.bsite.net/api/Calculator/CalculateLifeInsurance",
-      data
-    )
+    .post(`${BASE_API}/${LIFE_INSURANCE}/CalculateLifeInsurance`, data)
     .then((res) => res.data as BaseRes<LifeInsuraceCalcRes>)
     .catch((err) => console.error(err))
     .finally(() => FinallyClb && FinallyClb());
-};
-
-export const calculatePension = async (data: PensionCalcReq) => {
-  return axios
-    .post("https://ganny01.bsite.net/api/Calculator/GetPensionValue", data)
-    .then((res) => res.data as PensionCalcRes)
-    .catch((err) => console.error(err));
 };

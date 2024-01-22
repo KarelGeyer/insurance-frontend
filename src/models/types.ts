@@ -27,18 +27,13 @@ export type ProductFilterType =
   | "Název firmy"
   | "Typ pojištění";
 
-export type RouteType =
-  | "/"
-  | "/products"
-  | "/calculator"
-  | "/product"
-  | "/order";
+export type RouteType = "/" | "/products" | "/product" | "/order" | "/orders";
 
 export type HeaderNameType =
   | "Hlavní Stránka"
   | "Produkty"
   | "Produkt"
-  | "Kalkulačka"
+  | "Objednávky"
   | "Objednávka";
 
 export type FilterTypeAttribute = "category" | "name" | "companyName";

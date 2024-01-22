@@ -7,7 +7,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import HomeIcon from "@mui/icons-material/Home";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import CalculateIcon from "@mui/icons-material/Calculate";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -35,8 +34,7 @@ const Sidebar = () => {
   const menuItems: HeaderNameType[] = [
     "Hlavní Stránka",
     "Produkty",
-    "Kalkulačka",
-    "Objednávka",
+    "Objednávky",
   ];
 
   const toggleDrawer = (open: boolean) => () => {
@@ -77,8 +75,7 @@ const Sidebar = () => {
                       <ListItemIcon>
                         {text === "Hlavní Stránka" && <HomeIcon />}
                         {text === "Produkty" && <FormatListBulletedIcon />}
-                        {text === "Kalkulačka" && <CalculateIcon />}
-                        {text === "Objednávka" && <ShoppingCartIcon />}
+                        {text === "Objednávky" && <ShoppingCartIcon />}
                       </ListItemIcon>
                       <ListItemText primary={text} />
                     </ListItemButton>
