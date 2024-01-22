@@ -1,0 +1,95 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(56, 46, 46, 0.87);
+  background-color: #f1f1f1;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.header {
+  border-bottom: 1px solid black;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 80vh;
+  padding: 16px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.footer {
+  border: 1px solid black;
+}
+
+.calculator-page {
+  width: 100%;
+}
+
+.search-input {
+  border: none;
+  background-color: transparent;
+  color: #000;
+  height: 100%;
+  padding: 8px 16px;
+  font-size: large;
+  width: 100%;
+  box-shadow: none;
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation16.MuiDrawer-paper.MuiDrawer-paperAnchorLeft.css-4t3x6l-MuiPaper-root-MuiDrawer-paper {
+  margin-top: 80px;
+}
+
+.product-img {
+  width: 150px;
+  height: 150px;
+}
+
+.product-img.garage {
+  width: 139px;
+  height: 120px;
+  padding-top: 18px;
+}
+
+.pension-config-input {
+  height: 25px;
+  width: 150px;
+  background-color: transparent;
+  font-size: 1.25rem;
+  color: #000;
+  text-align: center;
+  border: none;
+  box-shadow: none;
+}
+
+input.pension-config-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input.pension-config-input::-webkit-outer-spin-button,
+input.pension-config-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pension-config-input:focus {
+  outline: none;
+}
