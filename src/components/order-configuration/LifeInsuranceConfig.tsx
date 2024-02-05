@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import Section from "../Section";
 import { Box, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../state/redux/store";
+import { calculateLifeInsurance } from "../../helpers/axios/lifeInsurance";
+import Loading from "../Loading";
 import {
   LifeInsuraceCalcReq,
   LifeInsuraceCalcRes,
-  calculateLifeInsurance,
-} from "../../helpers/axios/lifeInsurance";
-import Loading from "../Loading";
+} from "../../models/interfaces";
 
-const LifeInsuranceConfig = () => {
+interface IProps {
+  setYearlyPrice: (value: number) => void;
+}
+
+const LifeInsuranceConfig = ({ setYearlyPrice }: IProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [calculation, setCalculation] = useState<LifeInsuraceCalcRes>({
     monthlyLifeInsurance: {
@@ -58,12 +61,13 @@ const LifeInsuranceConfig = () => {
         if (!res) return;
         if (res.status !== 200) return;
         setCalculation(res.data);
+        setYearlyPrice(res.data.yearlyLifeInsurance.totalInsurancePrice);
       });
     }
   }, [productId, lifeInsuranceData]);
 
   return (
-    <Section marginTop={5}>
+    <>
       <Typography variant="h4" gutterBottom>
         Kalkulace pro product
       </Typography>
@@ -271,7 +275,7 @@ const LifeInsuranceConfig = () => {
           </Box>
         </Box>
       )}
-    </Section>
+    </>
   );
 };
 

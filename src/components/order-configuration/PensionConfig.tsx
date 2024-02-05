@@ -11,7 +11,11 @@ import {
 } from "../../helpers/axios/pensionInsurance";
 import Loading from "../Loading";
 
-const PensionConfig = () => {
+interface IProps {
+  setYearlyPrice: (value: number) => void;
+}
+
+const PensionConfig = ({ setYearlyPrice }: IProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [pensionDataRes, setPensionDataRes] = useState<PensionCalcRes>({
     valorization: 0,
@@ -47,13 +51,19 @@ const PensionConfig = () => {
             totalSavings: totalSavings,
             valorization: valorization,
           });
+          setYearlyPrice(
+            (pensionData.yourContribution +
+              pensionData.employerContribution +
+              res.data.stateContribution) *
+              12
+          );
         })
         .finally(() => setLoading(false));
     }
   }, [pensionData, productId, user]);
 
   return (
-    <Section marginTop={5}>
+    <>
       <Typography variant="h4" gutterBottom>
         Kalkulace pro product
       </Typography>
@@ -170,7 +180,7 @@ const PensionConfig = () => {
           </Box>
         </Box>
       )}
-    </Section>
+    </>
   );
 };
 

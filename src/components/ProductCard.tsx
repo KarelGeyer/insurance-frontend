@@ -18,7 +18,7 @@ const ProductCard = ({ product }: IProps) => {
   const navigate = useNavigate();
 
   const redirectToProductDetail = () => {
-    navigate(`/product/${product.name}`, { state: { product } });
+    navigate(`/product/${product.id}`, { state: { product } });
   };
 
   return (

@@ -8,24 +8,28 @@ import PropertyInsuranceConfig from "./PropertyInsuranceConfig";
 interface IProps {
   category: ProductCategory;
   shouldSubmit: boolean;
+  setConfigValid: (isValid: boolean) => void;
 }
 
-const ProductConfiguration = ({ category, shouldSubmit }: IProps) => {
+const ProductConfiguration = ({
+  category,
+  shouldSubmit,
+  setConfigValid,
+}: IProps) => {
   return (
-    <ProductDetailWrapper marginTop={5}>
-      {category === ProductCategory.LIFE_INSURANCE && (
-        <LifeInsuranceConfig shouldSubmit={shouldSubmit} />
-      )}
-      {category === ProductCategory.PROPERTY_INSURANCE && (
-        <PropertyInsuranceConfig shouldSubmit={shouldSubmit} />
-      )}
-      {category === ProductCategory.PENSION && (
-        <PensionConfig
-          validator={new Validator()}
-          shouldSubmit={shouldSubmit}
-        />
-      )}
-    </ProductDetailWrapper>
+    <>
+      <ProductDetailWrapper marginTop={5}>
+        {category === ProductCategory.LIFE_INSURANCE && (
+          <LifeInsuranceConfig shouldSubmit={shouldSubmit} />
+        )}
+        {category === ProductCategory.PROPERTY_INSURANCE && (
+          <PropertyInsuranceConfig setIsValid={setConfigValid} />
+        )}
+        {category === ProductCategory.PENSION && (
+          <PensionConfig setIsValid={setConfigValid} />
+        )}
+      </ProductDetailWrapper>
+    </>
   );
 };
 

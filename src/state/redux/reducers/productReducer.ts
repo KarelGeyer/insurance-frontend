@@ -1,22 +1,41 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   ILifeInsuranceData,
   IPensionData,
+  IProduct,
   IPropertyInsuranceData,
 } from "../../../models/interfaces";
 import { Invalidity, ProductCategory } from "../../../helpers/enums";
+import { getProduct } from "../../../helpers/axios/products";
 
 interface ProductState {
+  baseProductInfo: {
+    product: IProduct;
+    loading: boolean;
+    error: string;
+  };
   lifeInsuranceData: ILifeInsuranceData;
   propertyInsuranceData: IPropertyInsuranceData;
   pensionData: IPensionData;
-  chosenProduct: ProductCategory | 0;
+  productCategory: ProductCategory;
   monthlyIncome: number;
   productId?: string;
   productName?: string;
 }
 
 const initialState: ProductState = {
+  baseProductInfo: {
+    product: {
+      id: "",
+      name: "",
+      description: "",
+      companyName: "",
+      companyLogo: "",
+      category: ProductCategory.LIFE_INSURANCE,
+    } as IProduct,
+    loading: false,
+    error: "",
+  },
   lifeInsuranceData: {
     death: 0,
     injuries: 0,
@@ -41,6 +60,7 @@ const initialState: ProductState = {
       city: "",
       zipCode: "",
     },
+    squareMeters: 0,
   },
   pensionData: {
     strategy: "Konzervativní",
@@ -48,14 +68,22 @@ const initialState: ProductState = {
     yourContribution: 0,
     employerContribution: 0,
   },
-  chosenProduct: 0,
+  productCategory: ProductCategory.NONE,
   monthlyIncome: 0,
   productId: "",
   productName: "",
 };
 
+export const fetchProductInfo = createAsyncThunk(
+  "product/fetchData",
+  async (id: string) => {
+    const response = await getProduct(id);
+    return response;
+  }
+);
+
 export const productReducer = createSlice({
-  name: "appSettingsReducer",
+  name: "productReducer",
   initialState,
   reducers: {
     setProductsLifeInsuranceData: (
@@ -91,16 +119,47 @@ export const productReducer = createSlice({
     setProductBaseInfo: (
       state,
       action: {
-        payload: { id: string; name: string; chosenProduct: ProductCategory };
+        payload: { id: string; name: string; productCategory: ProductCategory };
       }
     ) => {
       return {
         ...state,
         productId: action.payload.id,
         productName: action.payload.name,
-        chosenProduct: action.payload.chosenProduct,
+        productCategory: action.payload.productCategory,
       };
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchProductInfo.pending, (state) => {
+      return {
+        ...state,
+        baseProductInfo: {
+          ...state.baseProductInfo,
+          loading: true,
+        },
+      };
+    });
+    builder.addCase(fetchProductInfo.fulfilled, (state, action) => {
+      return {
+        ...state,
+        baseProductInfo: {
+          error: "",
+          product: action.payload,
+          loading: false,
+        },
+      };
+    });
+    builder.addCase(fetchProductInfo.rejected, (state, action) => {
+      return {
+        ...state,
+        baseProductInfo: {
+          product: {} as IProduct,
+          loading: false,
+          error: action.error.message || "Error",
+        },
+      };
+    });
   },
 });
 

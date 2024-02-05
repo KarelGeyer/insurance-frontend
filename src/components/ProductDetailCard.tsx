@@ -2,16 +2,18 @@ import { Avatar, Divider, Typography } from "@mui/material";
 import { IProduct } from "../models/interfaces";
 import { categoryIntToName } from "../helpers/functions";
 import Section from "./Section";
+import Loading from "./Loading";
 
 interface IProps {
   product: IProduct;
+  loading: boolean;
 }
 
-const ProductDetailCard = ({ product }: IProps) => {
+const ProductDetailCard = ({ product, loading }: IProps) => {
   return (
     <Section marginTop={2}>
       <Typography variant="h4" gutterBottom>
-        {product.name}
+        {loading ? <Loading isSimple isLinear /> : product.name}
       </Typography>
       <Avatar
         alt={product.companyName}
@@ -19,15 +21,20 @@ const ProductDetailCard = ({ product }: IProps) => {
         sx={{ width: 120, height: 120, marginY: 2 }}
       />
       <Typography variant="h6" color="textSecondary" gutterBottom>
-        {product.companyName}
+        {loading ? <Loading isSimple isLinear /> : product.companyName}
       </Typography>
       <Divider sx={{ marginY: 2 }} />
       <Typography variant="body1" paragraph>
-        {product.description}
+        {loading ? <Loading isSimple isLinear /> : product.description}
       </Typography>
       <Divider sx={{ marginY: 2 }} />
       <Typography variant="subtitle1" color="textSecondary">
-        Kategorie: {categoryIntToName(product.category)}
+        Kategorie:{" "}
+        {loading ? (
+          <Loading isSimple isLinear />
+        ) : (
+          categoryIntToName(product.category)
+        )}
       </Typography>
     </Section>
   );

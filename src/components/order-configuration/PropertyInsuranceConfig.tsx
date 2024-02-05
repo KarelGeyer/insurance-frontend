@@ -10,7 +10,11 @@ import {
 } from "../../helpers/axios/propertyInsurance";
 import Loading from "../Loading";
 
-const PropertyInsuranceConfig = () => {
+interface IProps {
+  setYearlyPrice?: (value: number) => void;
+}
+
+const PropertyInsuranceConfig = ({ setYearlyPrice }: IProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [propertyInsuranceCalcData, setPropertyInsuranceCalcData] =
     useState<PropertyCalcRes>({
@@ -52,12 +56,13 @@ const PropertyInsuranceConfig = () => {
         if (!res) return;
         if (res.status !== 200) return;
         setPropertyInsuranceCalcData(res.data);
+        setYearlyPrice && setYearlyPrice(res.data.totalCalc.totalPrice * 12);
       })
       .finally(() => setLoading(false));
   }, [productId, propertyInsuranceData]);
 
   return (
-    <Section marginTop={5}>
+    <>
       <Typography variant="h4" gutterBottom>
         Kalkulace pro product
       </Typography>
@@ -169,6 +174,75 @@ const PropertyInsuranceConfig = () => {
                   Cena za pojištění vybavení
                 </Typography>
                 <Typography variant="body1" fontWeight={600}>
+                  {propertyInsuranceCalcData?.totalCalc?.equipmentPrice / 12}Kč
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "80%",
+                }}
+              >
+                <Typography variant="body1">
+                  Cena za pojištění vybavení
+                </Typography>
+                <Typography variant="body1" fontWeight={600}>
+                  {propertyInsuranceCalcData?.totalCalc?.liabilityPrice / 12}Kč
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "80%",
+                }}
+              >
+                <Typography variant="body1">
+                  Cena za pojištění nemovitosti
+                </Typography>
+                <Typography variant="body1" fontWeight={600}>
+                  {propertyInsuranceCalcData?.totalCalc?.propertyPrice / 12}Kč
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "80%",
+                  padding: "8px 0",
+                }}
+              >
+                <Typography variant="h6" fontWeight={600}>
+                  Celková cena
+                </Typography>
+                <Typography variant="h6" fontWeight={600}>
+                  {propertyInsuranceCalcData?.totalCalc?.totalPrice / 12} Kč
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box width={1} sx={{ padding: "24px 16px 8px 40px" }}>
+            <Typography
+              variant="h5"
+              sx={{ padding: "16px 0", fontWeight: 600 }}
+            >
+              Cena za rok
+            </Typography>
+            <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "80%",
+                }}
+              >
+                <Typography variant="body1">
+                  Cena za pojištění vybavení
+                </Typography>
+                <Typography variant="body1" fontWeight={600}>
                   {propertyInsuranceCalcData?.totalCalc?.equipmentPrice}Kč
                 </Typography>
               </Box>
@@ -218,78 +292,9 @@ const PropertyInsuranceConfig = () => {
               </Box>
             </Box>
           </Box>
-
-          <Box width={1} sx={{ padding: "24px 16px 8px 40px" }}>
-            <Typography
-              variant="h5"
-              sx={{ padding: "16px 0", fontWeight: 600 }}
-            >
-              Cena za rok
-            </Typography>
-            <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "80%",
-                }}
-              >
-                <Typography variant="body1">
-                  Cena za pojištění vybavení
-                </Typography>
-                <Typography variant="body1" fontWeight={600}>
-                  {propertyInsuranceCalcData?.totalCalc?.equipmentPrice * 12}Kč
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "80%",
-                }}
-              >
-                <Typography variant="body1">
-                  Cena za pojištění vybavení
-                </Typography>
-                <Typography variant="body1" fontWeight={600}>
-                  {propertyInsuranceCalcData?.totalCalc?.liabilityPrice * 12}Kč
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "80%",
-                }}
-              >
-                <Typography variant="body1">
-                  Cena za pojištění nemovitosti
-                </Typography>
-                <Typography variant="body1" fontWeight={600}>
-                  {propertyInsuranceCalcData?.totalCalc?.propertyPrice * 12}Kč
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "80%",
-                  padding: "8px 0",
-                }}
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  Celková cena
-                </Typography>
-                <Typography variant="h6" fontWeight={600}>
-                  {propertyInsuranceCalcData?.totalCalc?.totalPrice * 12} Kč
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
         </>
       )}
-    </Section>
+    </>
   );
 };
 

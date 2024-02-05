@@ -1,22 +1,29 @@
+import { useSelector } from "react-redux";
 import { ProductCategory } from "../../helpers/enums";
 import ProductDetailWrapper from "../Section";
 import LifeInsuranceConfig from "./LifeInsuranceConfig";
 import PensionConfig from "./PensionConfig";
 import PropertyInsuranceConfig from "./PropertyInsuranceConfig";
+import { RootState } from "../../state/redux/store";
 
 interface IProps {
-  category: ProductCategory;
-  shouldSubmit: boolean;
+  setYearlyPrice: (value: number) => void;
 }
 
-const OrderConfiguration = ({ category }: IProps) => {
+const OrderConfiguration = ({ setYearlyPrice }: IProps) => {
+  const { productCategory } = useSelector((state: RootState) => state.product);
+
   return (
     <ProductDetailWrapper marginTop={5}>
-      {category === ProductCategory.LIFE_INSURANCE && <LifeInsuranceConfig />}
-      {category === ProductCategory.PROPERTY_INSURANCE && (
-        <PropertyInsuranceConfig />
+      {productCategory === ProductCategory.LIFE_INSURANCE && (
+        <LifeInsuranceConfig setYearlyPrice={setYearlyPrice} />
       )}
-      {category === ProductCategory.PENSION && <PensionConfig />}
+      {productCategory === ProductCategory.PROPERTY_INSURANCE && (
+        <PropertyInsuranceConfig setYearlyPrice={setYearlyPrice} />
+      )}
+      {productCategory === ProductCategory.PENSION && (
+        <PensionConfig setYearlyPrice={setYearlyPrice} />
+      )}
     </ProductDetailWrapper>
   );
 };

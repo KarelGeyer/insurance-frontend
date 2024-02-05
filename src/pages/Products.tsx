@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IProduct } from "../models/interfaces";
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 import CustomAccordion from "../components/Accordion";
 import { useSelector } from "react-redux";
 import { RootState } from "../state/redux/store";
@@ -12,9 +12,10 @@ import { getProducts } from "../helpers/axios/products";
 import Loading from "../components/Loading";
 
 const Products = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
+  // const [products, setProducts] = useState<IProduct[]>([])
   const [productsList, setProductsList] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [number, setNumber] = useState<number>(0);
 
   const { productsView, productTypeView, sortType, filterType, searchValue } =
     useSelector((state: RootState) => state.appSettings);
@@ -24,51 +25,76 @@ const Products = () => {
     getProducts()
       .then((data) => {
         setProductsList(data);
-        setProducts(data);
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
-    // axios
-    //   .get("https://localhost:7089/api/Products/GetProducts")
-    //   .then((res) => {
-    //     console.log(res.data.data);
-    //     return res.data.data;
-    //   })
-    //   .then((data) => {
-    //     setProductsList(data);
-    //     setProducts(data);
-    //   })
-    //   .catch((err) => console.log(err))
-    //   .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    const sortedProducts = productsList
-      .filter((product) => {
-        if (productTypeView === "Všechny produkty") return true;
-        return categoryIntToName(product.category) === productTypeView;
-      })
-      .filter((product) => {
-        if (searchValue === "") return true;
-        return product.name.toLowerCase().includes(searchValue!.toLowerCase());
-      })
+  const filteredProducts = useMemo(() => {
+    const filteredProducts = productsList
+      .filter(
+        (product) =>
+          (productTypeView === "Všechny produkty" ||
+            categoryIntToName(product.category) === productTypeView) &&
+          (searchValue === "" ||
+            product.name.toLowerCase().includes(searchValue!.toLowerCase()))
+      )
       .sort((productA, productB) => {
         const attr = filterTypeToAttribute(filterType);
+        const isAscending = sortType === SortType.ASC;
         if (typeof productA[attr] == "string") {
-          if (sortType === SortType.ASC) {
-            return (productA[attr] as string).localeCompare(productB.name);
-          }
-          return (productB[attr] as string).localeCompare(productA.name);
+          return (
+            isAscending
+              ? (productA[attr] as string)
+              : (productB[attr] as string)
+          ).localeCompare(isAscending ? productB.name : productA.name);
         } else {
-          if (sortType === SortType.ASC) {
-            return (productA[attr] as number) - (productB[attr] as number);
-          }
-          return (productB[attr] as number) - (productA[attr] as number);
+          return isAscending
+            ? (productA[attr] as number) - (productB[attr] as number)
+            : (productB[attr] as number) - (productA[attr] as number);
         }
       });
 
-    setProducts(sortedProducts);
-  }, [productsView, productTypeView, sortType, filterType, searchValue]);
+    for (let i = 0; i < 5000; i++) {
+      console.log(i);
+    }
+    return filteredProducts;
+  }, [
+    productsList,
+    productTypeView,
+    sortType,
+    filterType,
+    searchValue,
+    loading,
+  ]);
+
+  // useEffect(() => {
+  //   const filteredProducts = productsList
+  //     .filter(
+  //       (product) =>
+  //         (productTypeView === "Všechny produkty" ||
+  //           categoryIntToName(product.category) === productTypeView) &&
+  //         (searchValue === "" ||
+  //           product.name.toLowerCase().includes(searchValue!.toLowerCase()))
+  //     )
+  //     .sort((productA, productB) => {
+  //       const attr = filterTypeToAttribute(filterType);
+  //       const isAscending = sortType === SortType.ASC;
+  //       if (typeof productA[attr] == "string") {
+  //         return (
+  //           isAscending
+  //             ? (productA[attr] as string)
+  //             : (productB[attr] as string)
+  //         ).localeCompare(isAscending ? productB.name : productA.name);
+  //       } else {
+  //         return isAscending
+  //           ? (productA[attr] as number) - (productB[attr] as number)
+  //           : (productB[attr] as number) - (productA[attr] as number);
+  //       }
+  //     });
+
+  //   setProducts(filteredProducts);
+  // }, [productsView, productTypeView, sortType, filterType, searchValue]);
 
   return (
     <>
@@ -80,15 +106,17 @@ const Products = () => {
         </>
       ) : (
         <>
+          <button onClick={() => setNumber((prev) => prev + 1)}>click </button>
+          <p>{number}</p>
           {productsView === "card" ? (
             <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-              {products.map((product) => {
+              {filteredProducts.map((product) => {
                 return <ProductCard key={product.id} product={product} />;
               })}
             </Box>
           ) : (
             <AccordionTable>
-              {products.map((product) => {
+              {filteredProducts.map((product) => {
                 return (
                   <CustomAccordion
                     key={product.id}

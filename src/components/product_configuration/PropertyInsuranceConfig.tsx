@@ -4,8 +4,6 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
-  InputLabel,
-  OutlinedInput,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -14,72 +12,137 @@ import houseImage from "../../assets/img/home.png";
 import flatImage from "../../assets/img/flat.png";
 import garageImage from "../../assets/img/garage.png";
 import { PropertyType } from "../../models/types";
-import { IPropertyInsuranceData } from "../../models/interfaces";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setProductPropertyInsuranceData } from "../../state/redux/reducers/productReducer";
+import { RootState } from "../../state/redux/store";
+import BaseStringInput from "../user-data-form/BaseStringInput";
+import NumberInput from "../user-data-form/BaseNumberInput";
 
 interface IProps {
-  shouldSubmit: boolean;
+  setIsValid: (isValid: boolean) => void;
 }
 
-const PropertyInsuranceConfig = ({ shouldSubmit }: IProps) => {
+const PropertyInsuranceConfig = ({ setIsValid }: IProps) => {
+  const [valids, setValids] = useState<any>({
+    isPropertyTypeChosen: false,
+    isPropertySizeValid: false,
+    isAnyInsuranceTypeChosen: false,
+    isStreetValid: false,
+    isPostCodeValid: false,
+    isCityValid: false,
+  });
   const dispatch = useDispatch();
 
-  const [propertyInsuranceData, setPropertyInsuranceData] =
-    useState<IPropertyInsuranceData>({
-      propertyType: "none",
-      insuranceTypes: {
-        property: false,
-        equipment: false,
-        liability: false,
-      },
-      propertyAddress: {
-        street: "",
-        city: "",
-        zipCode: "",
-      },
-      squareMeters: 0,
+  const setIsAttributeValid = (type: string, value: boolean) => {
+    setValids((prev: any) => {
+      return {
+        ...prev,
+        [type]: value,
+      };
     });
+  };
+
+  const { propertyInsuranceData } = useSelector(
+    (state: RootState) => state.product
+  );
 
   const setPropertyType = (propertyType: PropertyType) => {
-    setPropertyInsuranceData({
-      ...propertyInsuranceData,
-      propertyType: propertyType,
-    });
+    dispatch(
+      setProductPropertyInsuranceData({
+        ...propertyInsuranceData,
+        propertyType,
+      })
+    );
   };
 
   const setInsuranceType = (insuranceType: string, value: boolean) => {
-    setPropertyInsuranceData({
-      ...propertyInsuranceData,
-      insuranceTypes: {
-        ...propertyInsuranceData.insuranceTypes,
-        [insuranceType]: value,
-      },
-    });
+    dispatch(
+      setProductPropertyInsuranceData({
+        ...propertyInsuranceData,
+        insuranceTypes: {
+          ...propertyInsuranceData.insuranceTypes,
+          [insuranceType]: value,
+        },
+      })
+    );
   };
 
-  const setPropertyAddress = (propertyAddress: string, value: string) => {
-    setPropertyInsuranceData({
-      ...propertyInsuranceData,
-      propertyAddress: {
-        ...propertyInsuranceData.propertyAddress,
-        [propertyAddress]: value,
-      },
-    });
+  const setPropertyCity = (value: string) => {
+    dispatch(
+      setProductPropertyInsuranceData({
+        ...propertyInsuranceData,
+        propertyAddress: {
+          ...propertyInsuranceData.propertyAddress,
+          city: value,
+        },
+      })
+    );
   };
 
-  const setSquareMeters = (value: number) => {
-    setPropertyInsuranceData({
-      ...propertyInsuranceData,
-      squareMeters: value,
-    });
+  const setPropertyStreet = (value: string) => {
+    dispatch(
+      setProductPropertyInsuranceData({
+        ...propertyInsuranceData,
+        propertyAddress: {
+          ...propertyInsuranceData.propertyAddress,
+          street: value,
+        },
+      })
+    );
   };
+
+  const setPropertyPostCode = (value: string) => {
+    dispatch(
+      setProductPropertyInsuranceData({
+        ...propertyInsuranceData,
+        propertyAddress: {
+          ...propertyInsuranceData.propertyAddress,
+          zipCode: value,
+        },
+      })
+    );
+  };
+
+  const setSquareMeters = (value: string) => {
+    dispatch(
+      setProductPropertyInsuranceData({
+        ...propertyInsuranceData,
+        squareMeters: parseInt(value),
+      })
+    );
+  };
+
+  const isAnyInsuranceTypeChosen =
+    propertyInsuranceData.insuranceTypes.property ||
+    propertyInsuranceData.insuranceTypes.equipment ||
+    propertyInsuranceData.insuranceTypes.liability;
 
   useEffect(() => {
-    if (shouldSubmit) {
-      dispatch(setProductPropertyInsuranceData(propertyInsuranceData));
-    }
-  }, [shouldSubmit]);
+    setIsAttributeValid("isAnyInsuranceTypeChosen", isAnyInsuranceTypeChosen);
+  }, [propertyInsuranceData.insuranceTypes]);
+
+  useEffect(() => {
+    const isValid =
+      valids.isPropertyTypeChosen &&
+      valids.isPropertySizeValid &&
+      valids.isAnyInsuranceTypeChosen &&
+      valids.isStreetValid &&
+      valids.isPostCodeValid &&
+      valids.isCityValid;
+    setIsValid(isValid);
+  }, [valids]);
+
+  useEffect(() => {
+    setValids({
+      ...valids,
+      isPropertyTypeChosen: propertyInsuranceData.propertyType !== "none",
+      isPropertySizeValid: propertyInsuranceData.squareMeters > 0,
+      isStreetValid: propertyInsuranceData.propertyAddress.street !== "",
+      isPostCodeValid: propertyInsuranceData.propertyAddress.zipCode !== "",
+      isCityValid: propertyInsuranceData.propertyAddress.city !== "",
+      isAnyInsuranceTypeChosen: isAnyInsuranceTypeChosen,
+    });
+  }, []);
 
   return (
     <>
@@ -101,7 +164,10 @@ const PropertyInsuranceConfig = ({ shouldSubmit }: IProps) => {
                 : "white",
           }}
           m={1}
-          onClick={() => setPropertyType("house")}
+          onClick={() => {
+            setPropertyType("house");
+            setIsAttributeValid("isPropertyTypeChosen", true);
+          }}
         >
           <img src={houseImage} className="product-img" />
         </Box>
@@ -116,7 +182,10 @@ const PropertyInsuranceConfig = ({ shouldSubmit }: IProps) => {
                 : "white",
           }}
           m={1}
-          onClick={() => setPropertyType("flat")}
+          onClick={() => {
+            setPropertyType("flat");
+            setIsAttributeValid("isPropertyTypeChosen", true);
+          }}
         >
           <img src={flatImage} className="product-img" />
         </Box>
@@ -131,27 +200,30 @@ const PropertyInsuranceConfig = ({ shouldSubmit }: IProps) => {
                 : "white",
           }}
           m={1}
-          onClick={() => setPropertyType("garage")}
+          onClick={() => {
+            setPropertyType("garage");
+            setIsAttributeValid("isPropertyTypeChosen", true);
+          }}
         >
           <img src={garageImage} className="product-img garage" />
         </Box>
       </Box>
       <Typography variant="h5" gutterBottom mt={5}>
-        Adresa domu
+        Velikost prostoru
       </Typography>
       <Box sx={{ display: "flex" }} width={"65%"} mt={2}>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel htmlFor="outlined-adornment-password">
-            Velikost prostoru v m&#178;
-          </InputLabel>
-          <OutlinedInput
-            id="street-and-house-number"
-            type="number"
-            label="Velikost prostoru v m&#178;"
-            onChange={(e) => setSquareMeters(parseInt(e.target.value))}
-            value={propertyInsuranceData.squareMeters}
-          />
-        </FormControl>
+        <NumberInput
+          type="squareMeters"
+          label="Velikost prostoru v m&#178;"
+          required
+          id="square-meters-input"
+          setIsValid={setIsAttributeValid}
+          validAttibute="isPropertySizeValid"
+          setValue={setSquareMeters}
+          value={propertyInsuranceData.squareMeters}
+          errorMessage={""}
+          sx={{ width: 1 }}
+        />
       </Box>
       <Typography variant="h5" gutterBottom mt={5}>
         Co vše chcete pojistit?
@@ -163,12 +235,13 @@ const PropertyInsuranceConfig = ({ shouldSubmit }: IProps) => {
               control={
                 <Checkbox
                   checked={propertyInsuranceData.insuranceTypes.property}
-                  onClick={() =>
+                  onClick={() => {
                     setInsuranceType(
                       "property",
                       !propertyInsuranceData.insuranceTypes.property
-                    )
-                  }
+                    );
+                    setIsAttributeValid("isAnyInsuranceTypeChosen", true);
+                  }}
                 />
               }
               label="Majetek"
@@ -216,40 +289,48 @@ const PropertyInsuranceConfig = ({ shouldSubmit }: IProps) => {
         Adresa domu
       </Typography>
       <Box sx={{ display: "flex" }} width={"65%"} mt={2}>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel htmlFor="outlined-adornment-password">
-            Ulice a číslo popisné
-          </InputLabel>
-          <OutlinedInput
-            id="street-and-house-number"
-            type="text"
-            label="Ulice a číslo popisné"
-            onChange={(e) => setPropertyAddress("street", e.target.value)}
-            value={propertyInsuranceData.propertyAddress.street}
-          />
-        </FormControl>
+        <BaseStringInput
+          label="Ulice"
+          id={"street-input"}
+          type="street"
+          errorMessage={"error"}
+          setIsValid={setIsAttributeValid}
+          validAttibute={"isStreetValid"}
+          isUserForm={false}
+          setValue={setPropertyStreet}
+          value={propertyInsuranceData.propertyAddress.street}
+          sx={{ width: "100%" }}
+        />
       </Box>
-      <Box sx={{ display: "flex" }} width={"65%"} mt={2}>
-        <FormControl variant="outlined" sx={{ width: "35%" }}>
-          <InputLabel htmlFor="outlined-adornment-password">PSČ</InputLabel>
-          <OutlinedInput
-            id="zip-code"
-            type="number"
-            label="PSČ"
-            onChange={(e) => setPropertyAddress("zipCode", e.target.value)}
-            value={propertyInsuranceData.propertyAddress.zipCode}
-          />
-        </FormControl>
-        <FormControl variant="outlined" sx={{ width: "60%", marginLeft: "5%" }}>
-          <InputLabel htmlFor="outlined-adornment-password">Obec</InputLabel>
-          <OutlinedInput
-            id="city"
-            type="text"
-            label="Obec"
-            onChange={(e) => setPropertyAddress("city", e.target.value)}
-            value={propertyInsuranceData.propertyAddress.city}
-          />
-        </FormControl>
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between" }}
+        width={"65%"}
+        mt={2}
+      >
+        <NumberInput
+          type="zipCode"
+          label="PSČ"
+          required
+          id="postcode-input"
+          setIsValid={setIsAttributeValid}
+          validAttibute="isPostCodeValid"
+          setValue={setPropertyPostCode}
+          value={parseInt(propertyInsuranceData.propertyAddress.zipCode)}
+          errorMessage={""}
+          min={10000}
+          max={99999}
+        />
+        <BaseStringInput
+          label="Obec"
+          id={"city-input"}
+          type="city"
+          errorMessage={"error"}
+          setIsValid={setIsAttributeValid}
+          validAttibute={"isCityValid"}
+          isUserForm={false}
+          setValue={setPropertyCity}
+          value={propertyInsuranceData.propertyAddress.city}
+        />
       </Box>
     </>
   );

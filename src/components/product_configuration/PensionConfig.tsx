@@ -4,39 +4,57 @@ import { useEffect, useState } from "react";
 import Validator from "../../helpers/Validator";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { IPensionData } from "../../models/interfaces";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setProductsPensionData } from "../../state/redux/reducers/productReducer";
+import NumberInput from "../user-data-form/BaseNumberInput";
+import { RootState } from "../../state/redux/store";
 
 interface IProps {
-  shouldSubmit: boolean;
-  validator: Validator;
+  setIsValid: (isValid: boolean) => void;
 }
-const PensionConfig = ({ validator, shouldSubmit }: IProps) => {
+const PensionConfig = ({ setIsValid }: IProps) => {
   const dispatch = useDispatch();
-
-  const [pensionData, setPensionData] = useState<IPensionData>({
-    strategy: "Konzervativní",
-    currentSavings: 0,
-    yourContribution: 0,
-    employerContribution: 0,
+  const [valids, setValids] = useState<any>({
+    isYouContributionValid: false,
+    isStrategyValid: false,
   });
+  const { pensionData } = useSelector((state: RootState) => state.product);
 
-  const managePenstionData = (
-    type: PensionDataType,
-    value: PensionStrategy | number
-  ) => {
-    setPensionData((prevState: any) => ({
-      ...prevState,
-      [type]: value,
-    }));
+  const setIsAtrributeValid = (type: string, value: boolean) => {
+    setValids((prev: any) => {
+      return {
+        ...prev,
+        [type]: value,
+      };
+    });
+  };
+
+  const managePenstionData = (type: string, value: string | number) => {
+    dispatch(
+      setProductsPensionData({
+        ...pensionData,
+        [type]: value,
+      })
+    );
+  };
+
+  const setYourContrion = (value: string) => {
+    dispatch(
+      setProductsPensionData({
+        ...pensionData,
+        yourContribution: parseInt(value),
+      })
+    );
   };
 
   const incrementPensionData = (type: PensionDataType) => {
-    setPensionData((prevState: any) => ({
-      ...prevState,
-      [type]: prevState[type] + 50,
-    }));
+    dispatch(
+      setProductsPensionData({
+        ...pensionData,
+        strategy: pensionData.strategy,
+        [type]: (pensionData[type] as number) + 50,
+      })
+    );
   };
 
   const decrementPensionData = (type: PensionDataType) => {
@@ -44,23 +62,35 @@ const PensionConfig = ({ validator, shouldSubmit }: IProps) => {
       (pensionData[type] as number) > 0 &&
       (pensionData[type] as number) - 50 >= 0
     ) {
-      setPensionData((prevState: any) => ({
-        ...prevState,
-        [type]: prevState[type] - 50,
-      }));
+      dispatch(
+        setProductsPensionData({
+          ...pensionData,
+          strategy: pensionData.strategy,
+          [type]: (pensionData[type] as number) - 50,
+        })
+      );
     } else {
-      setPensionData((prevState: any) => ({
-        ...prevState,
-        [type]: 0,
-      }));
+      dispatch(
+        setProductsPensionData({
+          ...pensionData,
+          strategy: pensionData.strategy,
+          [type]: 0,
+        })
+      );
     }
   };
 
   useEffect(() => {
-    if (shouldSubmit) {
-      dispatch(setProductsPensionData(pensionData));
-    }
-  }, [shouldSubmit]);
+    const isValid = valids.isYouContributionValid && valids.isStrategyValid;
+    setIsValid(isValid);
+  }, [valids]);
+
+  useEffect(() => {
+    setValids({
+      isYouContributionValid: pensionData.yourContribution > 0,
+      isStrategyValid: true,
+    });
+  }, []);
 
   return (
     <>
@@ -126,15 +156,22 @@ const PensionConfig = ({ validator, shouldSubmit }: IProps) => {
           <RemoveIcon />
         </IconButton>
         <Box display={"flex"} alignItems={"center"}>
-          <input
-            className="pension-config-input"
+          <NumberInput
+            baseInput={true}
+            type="yourContribution"
+            required
+            id="your-contribution-input"
+            setIsValid={setIsAtrributeValid}
+            validAttibute="isYouContributionValid"
+            setValue={setYourContrion}
             value={pensionData.yourContribution}
-            type="number"
-            onChange={(e) => {
-              const value = parseInt(e.target.value);
-              managePenstionData("yourContribution", value);
-            }}
+            errorMessage={""}
+            min={0}
+            max={1000000}
+            label={""}
+            className="pension-config-input"
           />
+
           <Typography variant="h6">Kč</Typography>
         </Box>
         <IconButton
@@ -212,7 +249,10 @@ const PensionConfig = ({ validator, shouldSubmit }: IProps) => {
               },
             }}
             elevation={8}
-            onClick={() => managePenstionData("strategy", "Konzervativní")}
+            onClick={() => {
+              managePenstionData("strategy", "Konzervativní");
+              setIsAtrributeValid("isStrategyValid", true);
+            }}
           >
             Konzervativní
           </Paper>
@@ -231,7 +271,10 @@ const PensionConfig = ({ validator, shouldSubmit }: IProps) => {
               },
             }}
             elevation={8}
-            onClick={() => managePenstionData("strategy", "Dynamická")}
+            onClick={() => {
+              managePenstionData("strategy", "Dynamická");
+              setIsAtrributeValid("isStrategyValid", true);
+            }}
           >
             Dynamická
           </Paper>
@@ -250,7 +293,10 @@ const PensionConfig = ({ validator, shouldSubmit }: IProps) => {
               },
             }}
             elevation={8}
-            onClick={() => managePenstionData("strategy", "Vyvážená")}
+            onClick={() => {
+              managePenstionData("strategy", "Vyvážená");
+              setIsAtrributeValid("isStrategyValid", true);
+            }}
           >
             Vyvážená
           </Paper>

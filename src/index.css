@@ -93,3 +93,7 @@ input.pension-config-input::-webkit-inner-spin-button {
 .pension-config-input:focus {
   outline: none;
 }
+
+.css-183mf81-MuiPaper-root-MuiAccordion-root.Mui-expanded {
+  margin: 0 !important;
+}

@@ -1,10 +1,14 @@
 import {
+  ExtendedStringInputType,
   FilterTypeAttribute,
   HeaderNameType,
+  NumberInputType,
   ProductFilterType,
   ProductTypeViewType,
   RouteType,
+  StringInputType,
 } from "../models/types";
+import { INPUT_MESSAGES } from "./constants";
 import { ProductCategory } from "./enums";
 
 type InputType = "INPUT" | "SELECT" | "TEXTAREA";
@@ -94,4 +98,15 @@ export const getLocationFromHeaderName = (
     default:
       return "/";
   }
+};
+
+export const formatDate = (date: string): string => {
+  const d = new Date(date);
+  return `${d.getDate()}.${
+    d.getMonth() + 1
+  }.${d.getFullYear()} - ${d.getHours()}:${d.getMinutes()}`;
+};
+
+export const getInputMessageByType = (type: string): string => {
+  return INPUT_MESSAGES[type as keyof typeof INPUT_MESSAGES];
 };

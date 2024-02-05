@@ -6,7 +6,8 @@ export enum ValidationResult {
 }
 
 export enum ProductCategory {
-  PENSION = 1,
+  NONE,
+  PENSION,
   LIFE_INSURANCE,
   PROPERTY_INSURANCE,
 }
